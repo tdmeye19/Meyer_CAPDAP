@@ -1,0 +1,195 @@
+Deer Tick Surveillance: Adults
+
+& Nymphs: Beginning 2008
+OVERVIEW
+
+Division of Epidemiology
+Bureau of Communicable Disease Control
+February 2018
+
+Health Data NY
+
+Department
+of Health
+
+NEW YORK
+STATE OF
+OPPORTU ITY,
+
+ 
+General Description:
+
+Tick-borne diseases, such as Lyme disease, anaplasmosis and babesiosis, are a significant issue
+in New York (NY), impacting well over 10,000 individuals yearly. The New York State
+Department of Health (NYSDOH) has a responsibility to perform surveillance to monitor and
+track different kinds of tick-borne diseases. While most surveillance is done via reportable cases
+of human illness, tick-borne diseases can also be monitored by collecting ticks from the
+environment (called active surveillance) and testing them for bacteria, viruses, and parasites
+known to cause illness. Active surveillance allows local county health departments in NY,
+excluding New York City (NYC) to have a better understanding of the tick populations present in
+the state, the species composition of the tick population, and the rate at which ticks are
+infected with different bacteria, parasites, or viruses (called pathogens). The Department
+started testing ticks in 2002 in limited areas; testing statewide began in 2008.
+
+The data provided are the results of deer tick surveillance, also known as blacklegged ticks or by
+their scientific name Ixodes scapularis. The datasets are split by life stages (adult and nymph).
+Deer ticks in the adult life stage are most commonly seen in fall and early winter. Deer ticks in
+the nymph life stage are most commonly seen in late spring and early summer. The biology is
+different between the life stages, therefore, the infection rates among the two life stages are
+also different, and it is important to look at the data separately.
+
+The first two datasets cover testing of individual deer ticks for bacteria and parasites that cause
+Lyme disease, anaplasmosis, babesiosis, and a relapsing fever illness recently associated with a
+bacteria called Borrelia miyamotoi.
+
+@ Deer Tick Surveillance: Adults (Oct to Dec) excluding Powassan virus: Beginning 2008
+e Deer Tick Surveillance: Nymphs (May to Sept) excluding Powassan virus: Beginning 2008
+
+The next two datasets cover testing for only for the Powassan virus (also known as Deer Tick
+virus). We do not include these data in the above datasets because ticks are not tested
+individually for Powassan/Deer tick virus, they are tested in groups, called “pools” of 5-10 ticks.
+
+e Deer Tick Surveillance: Adults (Oct to Dec) Powassan virus only: Beginning 2009
+e Deer Tick Surveillance: Nymphs (May to Sept) Powassan virus only: Beginning 2009
+
+Data from each publicly accessible site have been combined to be presented at the county level
+in these datasets. These data can be used by local county health departments, public land
+managers, medical and veterinary providers, and the public to encourage preventive measures
+to minimize exposure to ticks, thereby reducing the incidence of new cases of tick-borne
+disease in the state (excluding NYC).
+
+NEW YORK
+STATE OF
+OFPORTUNITY,
+
+Department
+of Health
+
+ 
+Data Methodology:
+
+As part of annual active surveillance efforts, staff visit approximately 100 publicly accessible
+sites across the state (excluding NYC) each year to monitor for certain tick-borne pathogens.
+
+The sites where ticks are sampled are selected for several reasons. Primarily, the sites are
+chosen because they are marketed as places where the public can spend recreational time
+hiking, hunting, or camping. They may be parks or preserves that are publicly owned. Some
+were chosen because multiple sites could be sampled in a day. Typically, a single site is not
+sampled comprehensively—for example, a large park will not be sampled multiple times to
+completely cover the entire area of the park. Some privately-owned sites are visited as part of
+special investigations; however, they are not included in these datasets.
+
+Ticks are collected by using techniques called “dragging” and “flagging.” These techniques
+involve capturing ticks by having them make contact with a piece of fabric that is held by a
+collector and brushed against the ground and vegetation during a walking survey. The goal is to
+collect at least 50 ticks at each collection site; for some sites that can take minutes, at other
+sites that can take hours or multiple visits, and at some locations it may not be feasible.
+Standardized methods are used to ensure that accurate measurements and comparisons can be
+made of tick population density.
+
+Ticks are returned to the NYSDOH laboratory, total sample DNA is extracted, and they are
+tested individually via real-time multiplex polymerase chain reaction (qPCR) for the presence of
+the following tick-borne pathogens.
+
+e Borrelia burgdorferi (B. burgdorferi) — bacterial causative agent of Lyme disease
+
+e Anaplasma phagocytophilum (A. phagocytophilum) — bacterial causative agent of
+anaplasmosis [also known as human granulocytic anaplasmosis (HGA)]
+
+e Babesia microti (B. microti) — parasitic causative agent of babesiosis
+
+e Borrelia miyamotoi (B. miyamotoi) — bacterial causative agent of a relapsing fever-like
+illness
+
+e Powassan/Deer Tick virus(POW/DTV)- viral causative agent of Powassan encephalitis
+and meningitis
+
+Deer ticks are not tested individually for POW/DTV, but in pools of 5-10 ticks. The POW/DTV
+data are in separate datasets from the other bacteria and parasite tests listed above.
+
+How to Understand the Data:
+
+These data depict number of publicly accessible sites visited (excluding NYC), number of ticks
+collected, number of deer ticks tested, the deer tick population density for that life stage, and
+
+NEW YORK
+STATE OF
+OFPORTUNITY,
+
+ 
+
+Department
+of Health
+
+ 
+the proportion (percent positive) of ticks infected with the specified bacteria, parasite or
+viruses by county and year from 2008-2016.
+
+It is natural to immediately look at the percentage of ticks positive for a specific bacteria,
+parasite, or virus, but that is only part of the risk equation for tick-borne diseases. Likelihood of
+encountering a tick also plays an important role, and we measure that through tick population
+density (lower is generally better). The likelihood of encountering a tick varies with time and
+location, within both the state and the county.
+
+The duration of time required for a deer tick to feed and transmit bacteria, parasites, or viruses
+is: 36 to 48 hours for B. burgdorferi, 12 to 24 hours for A. phagocytophilum, 24 to 36 hours for
+B. microti, and possibly as little as 15 minutes for the two lineages of Powassan virus. The
+feeding time required for B. miyamotoi transmission is currently unknown.
+
+Adult deer ticks primarily feed on deer or larger mammals, and will feed on humans. In general
+adult deer ticks are twice as likely to be infected with bacteria, parasites, or viruses than during
+the nymph stage. However, due to their larger size, adult deer ticks that have attached
+themselves to animals or humans are usually detected and removed before they can transmit
+bacteria, parasites, or viruses. Adult deer ticks are typically active from mid-October until
+temperatures are consistently below freezing. They are also present in late winter and early
+spring, from March through June.
+
+The nymph stage of the deer tick, though it has a lower infection rate than adults from the
+same geographic area, will feed on humans and is small in size and more difficult to detect than
+adults. This life stage is most likely to transmit tick-borne pathogens to people. Nymph deer
+ticks are active from mid-May through September.
+
+Limitations of Data Use:
+
+These data must not be over-interpreted. It is important to note that tick infection does not
+directly relate to the risk or prevalence of disease in humans. These results only provide
+information about tick infection at a precise location at one point in time. The data here
+summarizes multiple locations in a county, by year. Both tick population density and the
+proportion of ticks infected with the specified bacteria, parasite, or virus can vary greatly within
+a very small area, and vary widely within a county. Therefore, these data should not be used to
+broadly predict disease risk for a larger or smaller area, such as for the county or the town.
+They should be used simply to educate that there is a risk of coming in contact with ticks and
+tick-borne pathogens.
+
+Department
+of Health
+
+NEW YORK
+STATE OF
+OFPORTUNITY,
+
+ 
+Resources:
+
+NYSDOH performs tick surveillance to help provide information to local health departments and
+other agencies (e.g. parks departments, schools) so they can get prevention messages to the
+public. Prevention messages educate the public about the potential risk of encountering ticks
+and how to reduce the risk of exposure to ticks. Visit the Department’s website for important
+prevention messages: https://www.health.ny.gov/diseases/communicable/lyme/.
+
+In addition, the data serve to help communicate to healthcare providers in the community and
+remind them of the continued presence of Lyme disease as well as newly emerging tick-borne
+diseases [anaplasmosis (HGA), babesiosis, Borrelia miyamotoi infection, and Powassan
+encephalitis/meningitis]. For more information specific to your county, contact your local
+health department. To find contact information for your local health department, visit
+http://www.nysacho.org/i4a/pages/index.cfm?pageid=3713.
+
+Department
+of Health
+
+NEW YORK
+STATE OF
+OFPORTUNITY,
+
+ 
+

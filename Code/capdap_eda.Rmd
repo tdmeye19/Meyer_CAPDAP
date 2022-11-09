@@ -1,0 +1,199 @@
+---
+title: "Exploratory Data Analysis"
+author: "Trent Meyer"
+date: "2022-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(here)
+tick_adult <- read.csv(here("Data", "Deer_Tick_Surveillance__Adults__Oct_to_Dec__excluding_Powassan_virus__Beginning_2008.csv"))
+tick_nymph <- read.csv(here("Data", "Deer_Tick_Surveillance__Nymphs__May_to_Sept__excluding_Powassan_virus__Beginning_2008.csv"))
+```
+
+Let's rename the parasite and bacteria variables:
+```{r}
+tick_adult <- tick_adult %>% rename(B.burgdorferi = "B..burgdorferi....",
+                                    A.phagocytophilum = "A..phagocytophilum....",
+                                    B.microti = "B..microti....",
+                                    B.miyamotoi = "B..miyamotoi....")
+```
+
+
+County was read in as a character, instead we want it as a factor
+```{r}
+tick_adult <- tick_adult %>% mutate(County = as.factor(County), 
+                                    Year = as.factor(Year))
+tick_nymph <- tick_nymph %>% mutate(County = as.factor(County),
+                                    Year = as.factor(Year))
+```
+
+Let's graph total ticks collected to see what the distribution looks like.
+```{r}
+ggplot(data = tick_adult, aes(x = Total.Ticks.Collected)) +
+  geom_histogram()
+```
+
+We see that there is one observation with almost 12,000 ticks collected! I want to see now
+```{r}
+tick_adult$Total.Ticks.Collected
+```
+
+I found that there is an observation with 11,260 ticks collected! I am not sure if this is a mistake, or if they actually found this many ticks. I am leaning towards this being a true data point just because of where I got the data from.
+
+```{r}
+tick_adult %>% filter(Total.Ticks.Collected > 9000)
+```
+
+
+```{r}
+summary(tick_adult)
+```
+
+When I look at this, I see a lot of maximums that are much, much higher than the mean. Also, I can see that there is a mean of 2.486 total sites visited, however the maximum is 28. I also see that there are 221 NA's for B. miyamatoi, and when I saw this there are only NA's from 2008 to 2014, so maybe that was an issue where they were not testing for that until 2015.
+
+# Is there an association between the number of ticks collected and year?
+
+```{r}
+ggplot(data = tick_adult, aes(x = Year, y = Total.Ticks.Collected)) +
+  geom_col()
+
+ggplot(data = tick_adult, aes(x = Year, y = Total.Ticks.Collected)) +
+  geom_boxplot()
+```
+
+This is a tough plot to read into just because of 2018. where there is the one point with 11,260 ticks collected. The more I think about it, I might try to get rid of this point, as I am guessing that it will have high leverage on our statistical test.
+
+```{r}
+tick_adult <- tick_adult %>% filter(Total.Ticks.Collected < 9000)
+
+ggplot(data = tick_adult, aes(x = Year, y = Total.Ticks.Collected)) +
+  geom_col()
+
+ggplot(data = tick_adult, aes(x = Year, y = Total.Ticks.Collected)) +
+  geom_boxplot()
+```
+
+Now these plots are much easier to read, and give me an idea of whether or not there is an association between year and total ticks collected.
+
+# Is there an association between the number of ticks collected and Region (instead of county)?
+
+```{r}
+ggplot(data = tick_adult, aes(x = County, y = Total.Ticks.Collected)) +
+  geom_col() +
+  coord_flip()
+```
+
+This plot, and I think question are difficult to answer so I think I am going to create a variable for Region, and test if there is a difference between the 9 regions in NYS.
+
+```{r}
+tick_adult <- tick_adult %>% mutate(Region = case_when(
+  County == "Suffolk" | County == "Nassau" ~ "Long Island",
+  
+  County == "Brooklyn" | County == "Bronx" | County == "Manhattan" | 
+    County == "Staten Island" | County == "Queens" ~ "New York City",
+  
+  County == "Dutchess" | County == "Orange" | County == "Putnam" |
+    County == "Rockland" | County == "Sullivan" | County == "Ulster" |
+    County == "Westchester" ~ "Hudson Valley",
+  
+  County == "Niagara" | County == "Erie" | County == "Chautauqua" |
+    County == "Cattaragus" | County == "Cattaraugus" | 
+    County == "Allegany" ~ "Western New York",
+  
+  County == "Orleans" | County == "Genesee" | County == "Wyoming" |
+    County == "Monroe" | County == "Livingston" | County == "Wayne" |
+    County == "Ontario" | County == "Yates" | County == "Seneca" ~ "Finger Lakes",
+  
+  County == "Steuben" | County == "Schuyler" | County == "Chemung" | 
+    County == "Tompkins" | County == "Tioga" | County == "Chenango" 
+  | County == "Broome" | County == "Delaware" ~ "Southern Tier",
+  
+  County == "Cortland" | County == "Cayuga" | County == "Onondaga" | 
+    County == "Oswego" | County == "Madison" ~ "Central New York",
+  
+  County == "St. Lawrence" | County == "St Lawrence" | County == "Lewis" | 
+    County == "Jefferson" | County == "Hamilton" | County == "Essex" | 
+    County == "Clinton" | County == "Franklin" ~ "North Country",
+  
+  County == "Oneida" | County == "Herkimer" | County == "Fulton" | 
+    County == "Montgomery" | County == "Otsego" | 
+    County == "Schoharie" ~ "Mohawk Valley",
+  
+  County == "Albany" | County == "Columbia" | County == "Greene" | 
+    County == "Warren" | County == "Washington" | County == "Saratoga" | 
+    County == "Schenectady" | County == "Rensselaer" ~ "Capital District"
+))
+```
+
+Oof, that was a lot about code, now let's replot this by Region!
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = Total.Ticks.Collected)) +
+  geom_col() +
+  coord_flip()
+```
+
+It looks like there are possible differences, with Capital Region being much higher, and also possibly Hudson Valley have a higher number?
+
+# Is there a difference in the number of total ticks collected between Year, Region, and Total Ticks Collected?
+
+```{r}
+tick_adult_total <- tick_adult %>% group_by(Region, Year) %>% summarise(total_ticks_collected = sum(Total.Ticks.Collected))
+```
+
+This gives us a little look into the possibility that there might be a difference in the number of ticks collected given the year and region.
+
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = Total.Ticks.Collected)) +
+  geom_point(aes(colour = Year)) +
+  coord_flip()
+```
+
+It looks like the year 2016 is higher for Long Island, Hudson Valley, CNY, and Capital. I might try to fit a linear model and predict the total number of ticks collected given year and region.
+
+# Is there an association between Region and B.burgdorferi?
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = B.burgdorferi)) +
+  geom_point(aes(alpha = 0.9)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+There are possibly different means, however the spread overlaps a lot.
+
+# Is there an association between Region and A.phagocytophilum?
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = A.phagocytophilum)) +
+  geom_point(aes(alpha = 0.9)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Here it looks more likely to be a difference in mean, specifically with the Long Island, Hudson Valley, and Capital District regions looking to be higher than the rest.
+
+
+# Is there an association between Region and B.microti?
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = B.microti)) +
+  geom_point(aes(alpha = 0.9)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+There is lots of spread for the three regions again, I think their means look higher, but I would need to test to be certain.
+
+# Is there an association between Region and B.miyamotoi?
+```{r}
+ggplot(data = tick_adult, aes(x = Region, y = B.miyamotoi)) +
+  geom_point(aes(alpha = 0.9)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+This one is not as obvious that there could be a difference in the means. I would need to see, but I think this one could have the highest p-value of the four variables.
