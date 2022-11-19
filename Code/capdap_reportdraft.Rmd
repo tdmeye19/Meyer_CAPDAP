@@ -1,18 +1,31 @@
 ---
-title: "Exploratory Data Analysis"
+title: "Draft Data Analysis and Report"
 author: "Trent Meyer"
-date: "2022-11-04"
-output: html_document
+date: "2022-11-19"
+output: 
+  html_document:
+    theme: cosmo
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 ```
 
-## Use time series analysis
-## Chapter 6 year*region interaction term
-## Chapter 7: generalized linear model (glm())
+# Introduction
 
+Our data comes from the New York State Department of Health public database, which was completed over fourteen years from 2008 to 2021. They collected samples at sites throughout the 62 counties in New York state, recording the total ticks collected, tick population density, along with percentages of those ticks collected who were found to have specific bacteria or parasites.
+
+With data over many years, it would be interesting to look at if there is a difference in the Tick.Population.Density between the beginning year (2008) and the end year (2021). Independence between the two population densities would be more reasonable since the years are not closer together. Richard E.L. Paul, et. al., explain how their experiment yielded no changes in adult tick populations over time (2016). This would lead a look into the year and density to see if there is actually a difference or not.
+
+One idea to look into is that certain regions of New York State that may be more urbanized than others to see if the Tick.Population.Density differs compared to more rural regions. Paul (2016) describes that ticks' natural habitat are often forests where they come into contact with their hosts. Regions such as the North Country or Southern Tier, which are more rural compared to say NYC, have larger areas of forests which could mean higher tick population density.
+
+With the urbanization of many areas, ticks often find their way into suburban areas through nearby forests which house the ticks being used by domesticated pets and children (Paul 2016). This would lead a discussion about whether region and year are affecting the tick population density for the years 2008 and 2021. If areas are becoming more urbanized over time, that means that more ticks are possibly finding their way into cities.
+
+Many individuals in rural areas are aware of ticks, how to get rid of them, and where to find them. However, many individuals in cities are not as aware of ticks, and may not realize that ticks can carry bacteria or parasites that can cause harmful diseases. Kowalec et. al., explain that species of bacteria or parasites can "differ between natural and urban areas"(2017).  With this in mind, we can expect a possible difference between these bacteria and parasites while looking at years. Taking into account the urbanization of many areas, it could be possible to see more ticks with specific bacteria or parasites being found in more areas than say a decade ago.
+
+# Analysis
+
+Let's clear the environment, load in packages, and read in the tick data:
 ```{r}
 rm(list = ls())
 library(tidyverse)
@@ -40,21 +53,14 @@ tick_adult <- tick_adult %>%
          Year = as.factor(Year))
 ```
 
-```{r}
-# tick_adult <- tick_adult %>% mutate(County = as.factor(County), 
-#                                     Year = paste0("01-01-", Year))
 
-# tick_adult <- tick_adult %>% mutate(Year = mdy(Year),
-#                                     Year = year(Year))
-```
-
-I think tick population density is a reasonable response variable. Let's graph tick population density to see what the distribution looks like.
+Tick population density makes sense as a response variable, rather than total tick population. Let's graph tick population density to see what the distribution looks like.
 ```{r}
 ggplot(data = tick_adult, aes(x = Tick.Population.Density)) +
   geom_histogram()
 ```
 
-We see that there are two that have a Tick.Population.Density > 750. I am not sure if this is a mistake, or if they actually found this high of a tick population density. I think I am going to remove these two observations.
+We see that there are two that have a Tick.Population.Density > 750. I am not sure if this is a mistake, or if they actually found this high of a tick population density. Let's remove these observations from the data.
 
 ```{r}
 tick_adult <- tick_adult %>% filter(Tick.Population.Density < 750)
@@ -72,9 +78,9 @@ We can see that the data is right-skewed.
 summary(tick_adult)
 ```
 
-When I look at this, I see that the maximum is a bit higher than the mean. I think that I want to use this as my response for most of the statistical tests.
+We will use tick population density as the response for most of the statistical tests.
 
-# Is there significant difference in Tick.Population.Density between the first year (2008), and last year (2021)?
+## Is there significant difference in Tick.Population.Density between the first year (2008), and last year (2021)?
 
 I am going to subset the data to only have the observations for the years 2008 and 2021.
 
@@ -101,26 +107,30 @@ ggplot(data = tick_adult_small, aes(x = Tick.Population.Density)) +
 
 There is a bit of overlap in the spread of each year, however it looks like the mean is higher for 2021 compared to 2008. These plots are much easier to read with the few observations out that were making it difficult to read and compare between years. The histograms show that the peaks are in slightly different location on the x-axis.
 
-I think the way I have set this up, I am going to have to run a two-sample t-test. 
+I think the way I have set this up, I am going to have to run a two-sample t-test with the following hypotheses: 
 
-Null Hypothesis: There is no true difference in mean Tick.Population.Density between 2008 and 2021.
-Alternative Hypothesis: There is a true difference in mean Tick.Population.Density  between 2008 and 2021.
+--Null Hypothesis: There is no true difference in mean Tick.Population.Density between 2008 and 2021.
 
+--Alternative Hypothesis: There is a true difference in mean Tick.Population.Density  between 2008 and 2021.
+
+Let's run the two-sample t-test:
 ```{r}
 year_ttest <- t.test(Tick.Population.Density ~ Year, data = tick_adult_small)
 ```
 
 We can see from here that we have a p-value of `year_ttest$p.value`, which is very large! This would lead us to choose not to reject the null hypothesis, which means that we have evidence that there is no true difference in mean Tick.Population.Density between the years 2008 and 2021.
 
-# Is there an association between Tick.Population.Density and Region (instead of county)?
 
+## Is there an association between Tick.Population.Density and Region (instead of county)?
+
+Let's plot the relationship between Tick.Population.Density and County
 ```{r}
-ggplot(data = tick_adult, aes(x = County, y = Total.Ticks.Collected)) +
+ggplot(data = tick_adult, aes(x = County, y = Tick.Population.Density)) +
   geom_col() +
   coord_flip()
 ```
 
-This plot and question are difficult to answer so I think I am going to create a variable for Region, and test if there is a difference between the 9 regions in NYS. Also, we can see that there are two levels for St. Lawrence County, so I will combine those into the North Country region.
+This plot and question are difficult to answer so I think I am going to create a variable for Region, and test if there is a difference between the 9 regions in NYS. Also, we can see that there are two levels for St. Lawrence County, so let's combine those to both be in the North Country region.
 
 ```{r}
 tick_adult <- tick_adult %>% mutate(Region = case_when(
@@ -173,8 +183,9 @@ It looks like there are possible differences, with Capital Region being much hig
 
 Since we have a categorical predictor with at least three levels (Region) and a quantitative response, I think the best test would be an ANOVA. First we have to fit the model:
 
-Null Hypothesis: There is no difference in Region mean Tick.Population.Density
-Alternative Hypothesis: There is a difference in Region mean Tick.Population.Density
+-- Ho: There is no difference in Region mean Tick.Population.Density
+
+-- Ha: There is a difference in Region mean Tick.Population.Density
 
 ```{r}
 region_mod <- lm(Tick.Population.Density ~ Region, data = tick_adult)
@@ -195,7 +206,10 @@ region_anova <- anova(region_mod)
 
 So from the ANOVA table, we can see a very small p-value of 2.656e-12, which means that there is evidence for a difference between the mean Tick.Population.Density by Region.
 
-# Is there a difference in the Tick.Population.Density between the years 2008 and 2021 and Region?
+
+
+
+## Is there a difference in the Tick.Population.Density between the years 2008 and 2021 and Region?
 
 ```{r}
 tick_adult_total <- tick_adult %>% group_by(Region, Year) %>% summarise(total_ticks_collected = sum(Total.Ticks.Collected))
@@ -260,9 +274,10 @@ full_mod <- glm(Tick.Population.Density ~ Region + Year + Region*Year, data = ti
 summary(full_mod)
 ```
 
-I can see here that the p-value for the Long Island Region is not significant at all, instead it is a very large p-value.
+I can see here that the p-value for the Long Island Region is not significant at all, instead it is a very large p-value. The only other terms that are not significant are the interaction terms between Long Island-2021, Southern Tier-2021, and CNY-2021 are not significant.  All of the others are significant at the 5% level.
 
-# Is there a difference between mean B.burgdorferi percentage in the years 2008 and 2021?
+
+## Is there a difference between mean B.burgdorferi percentage in the years 2008 and 2021?
 ```{r}
 ggplot(data = tick_adult_small, aes(x = B.burgdorferi)) +
   geom_histogram() +
@@ -282,7 +297,9 @@ bburg_ttest <- t.test(B.burgdorferi ~ Year, data = tick_adult_small)
 
 We can see a p-value of `bburg_ttest$p.value`, which is very small, and leads us to determine that we can reject our null, and see evidence that there is a significant difference between the mean B.burgdorferi percentage in the years 2008 and 2021.
 
-# Is there a difference between mean A.phagocytophilum percentage in the years 2008 and 2021?
+
+
+## Is there a difference between mean A.phagocytophilum percentage in the years 2008 and 2021?
 ```{r}
 ggplot(data = tick_adult_small, aes(x = A.phagocytophilum)) +
   geom_histogram() +
@@ -302,7 +319,11 @@ aphago_ttest <- t.test(A.phagocytophilum ~ Year, data = tick_adult_small)
 
 We can see a p-value of `aphago_ttest$p.value`, which is small, and leads us to determine that we can reject our null, and see evidence that there is a significant difference between the mean A.phagocytophilum percentage in the years 2008 and 2021.
 
-# Is there an association between mean B.microti percentage in the years 2008 and 2021?
+
+
+
+
+## Is there an association between mean B.microti percentage in the years 2008 and 2021?
 ```{r}
 ggplot(data = tick_adult_small, aes(x = B.microti)) +
   geom_histogram() +
@@ -322,7 +343,9 @@ bmicroti_ttest <- t.test(B.microti ~ Year, data = tick_adult_small)
 
 We can see a p-value of `bmicroti_ttest$p.value`, which is small, and leads us to determine that we can reject our null, and see evidence that there is a significant difference between the mean B.microti percentage in the years 2008 and 2021.
 
-# Is there an association between mean B.miyamotoi percentage in the years 2015 and 2021 (there was no data for 2008-2014)?
+
+
+## Is there an association between mean B.miyamotoi percentage in the years 2015 and 2021 (there was no data for 2008-2014)?
 ```{r}
 tick_adult_small2 <- tick_adult %>% filter(Year == "2015" | Year == "2021")
 ggplot(data = tick_adult_small2, aes(x = B.miyamotoi)) +
@@ -342,3 +365,31 @@ bmiya_ttest <- t.test(B.miyamotoi ~ Year, data = tick_adult_small2)
 ```
 
 This is a very high p-value, meaning that there is not enough evidence to reject the null that there was no difference between the mean B.miyamotoi percentage between the years 2015 and 2021.
+
+
+# Biological Summary
+
+We have found that there was a significant difference in tick population density between the years 2008 and 2015, which is different from Paul (2016) stating that there was no difference in tick population over time. Paul (2016) also describes how ticks are spreading into more urban areas with urbanization and the spread of their hosts. We can see that the tick population density test by region was significant, we just need to see if possibly doing a two-sample t-test between a more urban and more rural region would lead us to more evidence of region affecting density.
+
+When looking at region and year, we could see differences in the mean tick population desnity between almost all regions when being compared to the Capital Region, except for Long Island. We would have to look to see if the Capital Region is more urban, however we know for certain that some more rural regions like the North Country, have a signficant difference compared to the Capital Region. The interaction terms are being compared to the Capital Region, and the only non-signficant ones were between year and CNY and Southern Tier. Both of these regions are more rural, with some urban areas. Paul (2016) explained how areas with forests or even now more suburban areas close to forests are experiencing higher tick population density. 
+
+We found that for all bacteria and parasites, they were all signficant except for B.miymaotoi. If we compared this by region, we might be able to see a difference in mean percentage of ticks with B.miyamotoi for the years. Kowalec saw differences between urban and rural areas, and with more urbanization we can see a signficant difference between the years, however it would be helpful to look at regions that are more urban versus rural.
+
+# Challenges
+
+I have had to think back to things I have learned in statistics classes up to two years ago. I do not think that I am interpreting the glm model with the interaction terms correctly. It was brought up using interaction terms, however, I think this model has too many parameters, so I focused on 2008 and 2021, and even after that it still has too many parameters. 
+
+I think for the first test using year and density, I decided to just use two years, the beginning (2008) and the end (2021) of the data in order to simplify things. I chose not to do a time-series analysis. But if I have more time, I would like to look into that as a possible test, because I think that might be useful especially for data by year.
+
+I think one thing I need to refresh myself on is just what tests to use in each scenario based on what types of data we have. Also, I think we did not really go into too much detail about the statistical assumptions, but I need to look at the normality assumption for the region-density question, as it does not look completely normal on the autoplot.
+
+I am also having trouble findings sources that help to explain my hypotheses, as there is not a lot of data explaining ticks and why they might be more densely population in certain areas. The issue with region is that I cannot really assume that one region is urban versus rural, because Upstate NY in general is quite rural. I might have large cities in those regions, but I do not know exactly where the samples were taken, so it makes this interpretation pretty difficult.
+
+
+
+
+# Works Cited
+
+Kowalec, M., Szewczyk, T., Welc-Falęciak, R., Siński, E., Karbowiak, G., & Bajer, A. (2017). Ticks and the city - are there any differences between city parks and natural forests in terms of tick abundance and prevalence of spirochaetes?. Parasites & vectors, 10(1), 573. https://doi.org/10.1186/s13071-017-2391-2
+
+Paul, R.E.L., Cote, M., Le Naour, E. et al. Environmental factors influencing tick densities over seven years in a French suburban forest. Parasites Vectors 9, 309 (2016). https://doi.org/10.1186/s13071-016-1591-5
