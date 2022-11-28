@@ -53,8 +53,11 @@ I think tick population density is a reasonable response variable. Let's graph t
 ggplot(data = tick_adult, aes(x = Tick.Population.Density)) +
   geom_histogram()
 ```
+Lots of zeros!
 
 We see that there are two that have a Tick.Population.Density > 750. I am not sure if this is a mistake, or if they actually found this high of a tick population density. I think I am going to remove these two observations.
+
+Can you tell how they defined tick population density? Because if it is ticks/ha or something, then 750 might be (horribly) reasonabile. What are the units?
 
 ```{r}
 tick_adult <- tick_adult %>% filter(Tick.Population.Density < 750)
@@ -112,6 +115,8 @@ year_ttest <- t.test(Tick.Population.Density ~ Year, data = tick_adult_small)
 
 We can see from here that we have a p-value of `year_ttest$p.value`, which is very large! This would lead us to choose not to reject the null hypothesis, which means that we have evidence that there is no true difference in mean Tick.Population.Density between the years 2008 and 2021.
 
+Since you have data on sites, I wonder if it would be worth doing this as a paired t-test where you have density in 2008 and 2021 as paired measures per site?
+
 # Is there an association between Tick.Population.Density and Region (instead of county)?
 
 ```{r}
@@ -119,8 +124,13 @@ ggplot(data = tick_adult, aes(x = County, y = Total.Ticks.Collected)) +
   geom_col() +
   coord_flip()
 ```
+St. Lawrence occurs twice. You need to check the levels for your factor variables to look for errors.
+
+Also, total.ticks.collected is misleading, because if someone tried harder to collect ticks in e.g. Westchester, and gets more, it may not mean there are actually more ticks there. So it might be more meaningful to compare tick.population.density, which they have tried to make comparable (though they don't seem to tell us how in the metatdata)
 
 This plot and question are difficult to answer so I think I am going to create a variable for Region, and test if there is a difference between the 9 regions in NYS. Also, we can see that there are two levels for St. Lawrence County, so I will combine those into the North Country region.
+
+Good. And see what I wrote about using pop density rather than total ticks collected.
 
 ```{r}
 tick_adult <- tick_adult %>% mutate(Region = case_when(
@@ -161,6 +171,8 @@ tick_adult <- tick_adult %>% mutate(Region = case_when(
     County == "Schenectady" | County == "Rensselaer" ~ "Capital District"
 ))
 ```
+Well done!
+
 
 Oof, that was a lot about code, now let's replot this by Region!
 ```{r}
@@ -188,12 +200,17 @@ autoplot(region_mod, smooth.colour = NA)
 
 This is difficult because we do need see very much of a line in the Normal Q-Q plot, meaning the normality assumption is not perfect. Also, we do not see the constant variance in the Res vs Fitted plot, but this is a little bit better than the normality.
 
+Smells like glm to me!
+
+
 ```{r}
 region_mod_summary <- summary(region_mod)
 region_anova <- anova(region_mod)
 ```
 
 So from the ANOVA table, we can see a very small p-value of 2.656e-12, which means that there is evidence for a difference between the mean Tick.Population.Density by Region.
+
+So we can do this as a glm and you can do tukey tests or similar to tell which regions are different.
 
 # Is there a difference in the Tick.Population.Density between the years 2008 and 2021 and Region?
 
@@ -261,6 +278,9 @@ summary(full_mod)
 ```
 
 I can see here that the p-value for the Long Island Region is not significant at all, instead it is a very large p-value.
+ 
+ 
+Can you think about how you might make a reasonable visualization of that test?
 
 # Is there a difference between mean B.burgdorferi percentage in the years 2008 and 2021?
 ```{r}
@@ -342,3 +362,5 @@ bmiya_ttest <- t.test(B.miyamotoi ~ Year, data = tick_adult_small2)
 ```
 
 This is a very high p-value, meaning that there is not enough evidence to reject the null that there was no difference between the mean B.miyamotoi percentage between the years 2015 and 2021.
+
+Running this many t-tests suggests to me that you may wish to use a Bonferroni correction. Here are some details: https://www.statology.org/bonferroni-correction/

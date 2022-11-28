@@ -54,13 +54,20 @@ tick_adult <- tick_adult %>%
 ```
 
 
-Tick population density makes sense as a response variable, rather than total tick population. Let's graph tick population density to see what the distribution looks like.
+Tick population density makes sense as a response variable, rather than total tick population. 
+
+Explain why.
+
+Let's graph tick population density to see what the distribution looks like.
 ```{r}
 ggplot(data = tick_adult, aes(x = Tick.Population.Density)) +
   geom_histogram()
 ```
 
+
 We see that there are two that have a Tick.Population.Density > 750. I am not sure if this is a mistake, or if they actually found this high of a tick population density. Let's remove these observations from the data.
+
+there are also a lot of zeros, which can lead to overdispersion of your data in a glm. See Chapter 7 for details, but we may wish to tweak your glm accordingly.
 
 ```{r}
 tick_adult <- tick_adult %>% filter(Tick.Population.Density < 750)
@@ -109,6 +116,8 @@ There is a bit of overlap in the spread of each year, however it looks like the 
 
 I think the way I have set this up, I am going to have to run a two-sample t-test with the following hypotheses: 
 
+Again, think about a paired t-test here with each county having a 2008 and a 2021 reading. Not sure if you'll get a different result, but it seems like a better model.
+
 --Null Hypothesis: There is no true difference in mean Tick.Population.Density between 2008 and 2021.
 
 --Alternative Hypothesis: There is a true difference in mean Tick.Population.Density  between 2008 and 2021.
@@ -120,6 +129,7 @@ year_ttest <- t.test(Tick.Population.Density ~ Year, data = tick_adult_small)
 
 We can see from here that we have a p-value of `year_ttest$p.value`, which is very large! This would lead us to choose not to reject the null hypothesis, which means that we have evidence that there is no true difference in mean Tick.Population.Density between the years 2008 and 2021.
 
+Rather than writing in `year_ttest$p.value` which requires the reader to go look up the value in the model output, why not just write in the p-value?
 
 ## Is there an association between Tick.Population.Density and Region (instead of county)?
 
@@ -199,6 +209,8 @@ autoplot(region_mod, smooth.colour = NA)
 
 This is difficult because we do need see very much of a line in the Normal Q-Q plot, meaning the normality assumption is not perfect. Also, we do not see the constant variance in the Res vs Fitted plot, but this is a little bit better than the normality.
 
+So, glm?
+
 ```{r}
 region_mod_summary <- summary(region_mod)
 region_anova <- anova(region_mod)
@@ -216,6 +228,9 @@ tick_adult_total <- tick_adult %>% group_by(Region, Year) %>% summarise(total_ti
 ```
 
 This gives us a little look into the possibility that there might be a difference in the number of ticks collected given the year and region.
+
+Because this 2-way model looks at both year and region, you don't need the earlier 2 statistical models. there is no reason to run all three, and doing so increases chance of Type 1 error.
+
 
 ```{r}
 ggplot(data = tick_adult, aes(x = Region, y = Tick.Population.Density)) +
@@ -275,6 +290,8 @@ summary(full_mod)
 ```
 
 I can see here that the p-value for the Long Island Region is not significant at all, instead it is a very large p-value. The only other terms that are not significant are the interaction terms between Long Island-2021, Southern Tier-2021, and CNY-2021 are not significant.  All of the others are significant at the 5% level.
+
+Which is cool! But can you think of a way to show it meaninfully in a data visualization?
 
 
 ## Is there a difference between mean B.burgdorferi percentage in the years 2008 and 2021?
@@ -367,6 +384,8 @@ bmiya_ttest <- t.test(B.miyamotoi ~ Year, data = tick_adult_small2)
 This is a very high p-value, meaning that there is not enough evidence to reject the null that there was no difference between the mean B.miyamotoi percentage between the years 2015 and 2021.
 
 
+As I noted in the eda, there might be some room for some cool time series plots with some of these data (no statistical test required). I'm also curious whether there is a relationship b/w expression of one bacterium and another via a regression model or simple correlation test.
+
 # Biological Summary
 
 We have found that there was a significant difference in tick population density between the years 2008 and 2015, which is different from Paul (2016) stating that there was no difference in tick population over time. Paul (2016) also describes how ticks are spreading into more urban areas with urbanization and the spread of their hosts. We can see that the tick population density test by region was significant, we just need to see if possibly doing a two-sample t-test between a more urban and more rural region would lead us to more evidence of region affecting density.
@@ -379,7 +398,17 @@ We found that for all bacteria and parasites, they were all signficant except fo
 
 I have had to think back to things I have learned in statistics classes up to two years ago. I do not think that I am interpreting the glm model with the interaction terms correctly. It was brought up using interaction terms, however, I think this model has too many parameters, so I focused on 2008 and 2021, and even after that it still has too many parameters. 
 
+If you wanted, you could just compare two regions and see how it goes - maybe a rural vs. more urban region?
+
 I think for the first test using year and density, I decided to just use two years, the beginning (2008) and the end (2021) of the data in order to simplify things. I chose not to do a time-series analysis. But if I have more time, I would like to look into that as a possible test, because I think that might be useful especially for data by year.
+
+I think getting a visualization might be pretty straigtforward. Here are a few references to get you started:
+https://www.neonscience.org/resources/learning-hub/tutorials/dc-time-series-plot-ggplot-r
+
+http://www.sthda.com/english/articles/32-r-graphics-essentials/128-plot-time-series-data-using-ggplot
+
+https://www.rstudio.com/resources/rstudioconf-2020/making-better-spaghetti-plots-exploring-the-individuals-in-longitudinal-data-with-the-brolgar-pac/
+
 
 I think one thing I need to refresh myself on is just what tests to use in each scenario based on what types of data we have. Also, I think we did not really go into too much detail about the statistical assumptions, but I need to look at the normality assumption for the region-density question, as it does not look completely normal on the autoplot.
 
