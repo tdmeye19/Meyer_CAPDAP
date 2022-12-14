@@ -1,0 +1,173 @@
+---
+title: "Capdap Presentation"
+author: "Trent Meyer"
+date: "2022-12-02"
+output: 
+  revealjs::revealjs_presentation:
+    theme: moon
+    transition: none
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+## Introduction to my dataset
+
+- My data comes from the [NYSDOH public database](https://health.data.ny.gov/Health/Deer-Tick-Surveillance-Adults-Oct-to-Dec-excluding/vzbp-i2d4)
+
+- Active tick surveillance began statewide in 2008
+
+- I chose this data because at home, I find lots of ticks on myself, my dogs, etc when in the woods
+
+## Glimpse of the data set
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggfortify)
+library(lubridate)
+library(scales)   # to access breaks/formatting functions
+library(gridExtra) # for arranging plots
+tick_adult <- read.csv(here("Data", "Deer_Tick_Surveillance__Adults__Oct_to_Dec__excluding_Powassan_virus__Beginning_2008.csv"))
+head(tick_adult)
+```
+
+- Each row corresponds to a collection in a county
+- Use Tick.Population.Density as response variable
+
+## Is there an association between Tick.Population.Density and Year?
+
+```{r}
+tick_adult <- tick_adult %>% mutate(Region = case_when(
+  County == "Suffolk" | County == "Nassau" ~ "Long Island",
+  
+  County == "Brooklyn" | County == "Bronx" | County == "Manhattan" | 
+    County == "Staten Island" | County == "Queens" ~ "New York City",
+  
+  County == "Dutchess" | County == "Orange" | County == "Putnam" |
+    County == "Rockland" | County == "Sullivan" | County == "Ulster" |
+    County == "Westchester" ~ "Hudson Valley",
+  
+  County == "Niagara" | County == "Erie" | County == "Chautauqua" |
+    County == "Cattaragus" | County == "Cattaraugus" | 
+    County == "Allegany" ~ "Western New York",
+  
+  County == "Orleans" | County == "Genesee" | County == "Wyoming" |
+    County == "Monroe" | County == "Livingston" | County == "Wayne" |
+    County == "Ontario" | County == "Yates" | County == "Seneca" ~ "Finger Lakes",
+  
+  County == "Steuben" | County == "Schuyler" | County == "Chemung" | 
+    County == "Tompkins" | County == "Tioga" | County == "Chenango" 
+  | County == "Broome" | County == "Delaware" ~ "Southern Tier",
+  
+  County == "Cortland" | County == "Cayuga" | County == "Onondaga" | 
+    County == "Oswego" | County == "Madison" ~ "Central New York",
+  
+  County == "St. Lawrence" | County == "St Lawrence" | County == "Lewis" | 
+    County == "Jefferson" | County == "Hamilton" | County == "Essex" | 
+    County == "Clinton" | County == "Franklin" ~ "North Country",
+  
+  County == "Oneida" | County == "Herkimer" | County == "Fulton" | 
+    County == "Montgomery" | County == "Otsego" | 
+    County == "Schoharie" ~ "Mohawk Valley",
+  
+  County == "Albany" | County == "Columbia" | County == "Greene" | 
+    County == "Warren" | County == "Washington" | County == "Saratoga" | 
+    County == "Schenectady" | County == "Rensselaer" ~ "Capital District"
+))
+
+(ggplot(data = tick_adult, aes(x = Year, y = Tick.Population.Density, group = Region)) +
+  geom_point())
+```
+
+## Narrowing it down to 2008 and 2021
+
+```{r}
+tick_adult_small <- tick_adult %>% mutate(Region = case_when(
+  County == "Suffolk" | County == "Nassau" ~ "Long Island",
+  
+  County == "Brooklyn" | County == "Bronx" | County == "Manhattan" | 
+    County == "Staten Island" | County == "Queens" ~ "New York City",
+  
+  County == "Dutchess" | County == "Orange" | County == "Putnam" |
+    County == "Rockland" | County == "Sullivan" | County == "Ulster" |
+    County == "Westchester" ~ "Hudson Valley",
+  
+  County == "Niagara" | County == "Erie" | County == "Chautauqua" |
+    County == "Cattaragus" | County == "Cattaraugus" | 
+    County == "Allegany" ~ "Western New York",
+  
+  County == "Orleans" | County == "Genesee" | County == "Wyoming" |
+    County == "Monroe" | County == "Livingston" | County == "Wayne" |
+    County == "Ontario" | County == "Yates" | County == "Seneca" ~ "Finger Lakes",
+  
+  County == "Steuben" | County == "Schuyler" | County == "Chemung" | 
+    County == "Tompkins" | County == "Tioga" | County == "Chenango" 
+  | County == "Broome" | County == "Delaware" ~ "Southern Tier",
+  
+  County == "Cortland" | County == "Cayuga" | County == "Onondaga" | 
+    County == "Oswego" | County == "Madison" ~ "Central New York",
+  
+  County == "St. Lawrence" | County == "St Lawrence" | County == "Lewis" | 
+    County == "Jefferson" | County == "Hamilton" | County == "Essex" | 
+    County == "Clinton" | County == "Franklin" ~ "North Country",
+  
+  County == "Oneida" | County == "Herkimer" | County == "Fulton" | 
+    County == "Montgomery" | County == "Otsego" | 
+    County == "Schoharie" ~ "Mohawk Valley",
+  
+  County == "Albany" | County == "Columbia" | County == "Greene" | 
+    County == "Warren" | County == "Washington" | County == "Saratoga" | 
+    County == "Schenectady" | County == "Rensselaer" ~ "Capital District"
+))
+tick_adult_small <- tick_adult_small %>% filter(Year == "2008" | Year == "2021")
+(ggplot(data = tick_adult_small, aes(x = Year, y = Tick.Population.Density, group = Region)) +
+  geom_point())
+```
+
+## Fitting my model
+```{r}
+full_mod <- glm(Tick.Population.Density ~ Region + Year + Region*Year, data = tick_adult_small)
+(summary(full_mod))
+```
+
+## Final Plot
+```{r}
+tick_adult_small_mean <- tick_adult_small %>% group_by(Year) %>% summarise(mean = mean(Tick.Population.Density, na.rm=T))
+(ggplot(data = tick_adult_small, aes(x = Year, y = Tick.Population.Density)) +
+  geom_point() +
+    geom_point(data = tick_adult_small_mean, aes(x = Year, y = mean), colour = "red", size = 3)
+  )
+```
+
+
+## Is there a difference between mean B.burgdorferi percentage in the years 2008 and 2021?
+
+```{r}
+ggplot(data = tick_adult_small, aes(x = B..burgdorferi....)) +
+  geom_histogram() +
+  facet_wrap(~Year)
+```
+
+## Two sample t-test
+
+```{r}
+(bburg_ttest <- t.test(B..burgdorferi.... ~ Year, data = tick_adult_small))
+```
+
+## Final Plot
+```{r}
+tick_adult_bburg <- tick_adult_small %>% filter(Year == "2008" | Year == "2021")
+tick_adult_bburg_mean <- tick_adult_bburg %>% group_by(Year) %>% summarise(mean = mean(B..burgdorferi...., na.rm=T))
+ggplot(data = tick_adult_small, aes(x = Year, y = B..burgdorferi....)) +
+  geom_point() + 
+  geom_point(data = tick_adult_bburg_mean, aes(x = Year, y = mean), colour = "red", size = 3) 
+```
+
+
+## Conclusion
+
+- Relearn many of these tests and analyses
+- Which models and tests one should use are different for everyone
+- Find helpful ways to plot after we create our model
